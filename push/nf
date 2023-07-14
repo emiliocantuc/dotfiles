@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Executes a command and calls 'notify' with a success or
+# fail msg w/subject $1.
+# E.g. nf 'subject here' python3 main.py
+
+subject=$1
+succ="[SUCC] $subject"
+fail="[FAIL] $subject"
+shift
+
+eval $@ && notify "$succ" || notify "$fail"

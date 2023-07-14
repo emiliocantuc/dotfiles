@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Sends a push notification to phone via ntfy (ntfy.sh).
+# Uses channel in $NTFY_CHANNEL and sends msg in $1.
+# It also adds the hostname as a tag.
+
+curl -d "$1" -H "Tags: $(hostname -s)" ntfy.sh/$NTFY_CHANNEL
