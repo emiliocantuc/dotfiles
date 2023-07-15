@@ -2,4 +2,4 @@
 
 # Shutdown (w/tuto) after passed command finishes.
 # Note: must be run w/sudo.
-$@ && tuto || tuto
+$@ && echo hello || echo hello
