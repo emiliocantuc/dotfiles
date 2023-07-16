@@ -1,12 +1,19 @@
 #!/bin/bash
 
 # Executes a command and calls 'notify' with a success or
-# fail msg w/subject $1.
+# fail msg w/subject $1. $1 must start with an upper case letter.
+# Will default to subject 'Run' if none is passed.
 # E.g. nf 'subject here' python3 main.py
 
-subject=$1
+# Check if the argument starts with upper case.
+if [[ $1 =~ ^[A-Z].*$ ]]; then
+    subject=$1
+    shift
+else
+    subject="Run"
+fi
+
 succ="[SUCC] $subject"
 fail="[FAIL] $subject"
-shift
-echo "here $subject"
-$@ && notify "$succ" || notify "$fail"
+
+"$@" && notify "$succ" || notify "$fail"
