@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# To be used when editing a tex file inside vim and
+# previewing with mac's Viewer. 
+
+# Compiles the file with pdflatex and shows changes.
+
+pdflatex $1 && osascript -e 'tell application "Preview" to activate' && osascript -e 'tell application "Terminal" to activate'
