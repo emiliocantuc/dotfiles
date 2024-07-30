@@ -1,6 +1,0 @@
-#!/bin/bash
-
-# Executes passed command w/nohup (nh) and upon completion
-# notifies the status (nf) and shuts down (tutoafter).
-
-sudo -E nh tutoafter nf "$@"

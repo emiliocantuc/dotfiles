@@ -1,7 +1,0 @@
-#!/bin/bash
-
-# Wraps the passed command with nohup [command] &
-# to execute it in a ssh session without terminating
-# once the pipe breaks.
-
-nohup "$@" 2> /dev/null &
