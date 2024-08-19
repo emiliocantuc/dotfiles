@@ -7,3 +7,9 @@ alias jr='jupyter nbconvert --execute --to notebook --inplace --allow-errors'
 
 # System
 alias tuto='sudo shutdown -h now'
+
+# Trim new lines and copy to clipboard
+alias c="tr -d '\n' | pbcopy"
+
+# Recursively delete `.DS_Store` files
+alias cleanup="find . -type f -name '*.DS_Store' -ls -delete"
