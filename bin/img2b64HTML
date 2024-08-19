@@ -1,4 +1,0 @@
-#!/bin/bash
-
-# Converts img file to base64, inserts into HTML tag and echos
-echo "<img width=400 src=\"data:image/png;base64, $(cat $1 | base64)\">"
