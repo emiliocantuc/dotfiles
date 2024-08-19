@@ -8,5 +8,11 @@ function nfiles(){
   		exit 1
 	fi
 
-	ls -F -1 | grep -v / | wc -l | awk '{$1=$1};1'
+	ls -F -1 $1 | grep -v / | wc -l | awk '{$1=$1};1'
+}
+
+# Converts img file to base64, inserts into HTML img and echos
+# Use: img2b64HTML cat.png
+function img2b64HTML(){
+	echo "<img width=400 src=\"data:image/png;base64, $(cat $1 | base64)\">"
 }
