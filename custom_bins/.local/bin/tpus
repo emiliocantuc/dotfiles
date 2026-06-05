@@ -828,7 +828,7 @@ def print_help(subcommand: str | None = None) -> None:
         '  launch <prefix> -n <N|A-B> [--zone <z>] [--type <t>] [--spot|--on-demand] [--cycle]\n'
         '                                   Batch-create numbered TPUs and auto-run setup.\n'
         '  rm <name> [--zone <z>] | --all [--quiet] | --preempted [--probe]\n'
-        '  ls [--probe] [--ready]\n'
+        '  ls [--probe|--fetch] [--ready]\n'
         '  status [--probe] [--util]\n'
         '  util [name]                        Utilization-focused view\n'
         '  note <name> <text>                 Store a local note for a TPU\n'
@@ -836,7 +836,7 @@ def print_help(subcommand: str | None = None) -> None:
         '  ssh <name> [--zone <z>] [-- extra-args]\n'
         '  run <name> <command...>\n'
         '  scp <name> <src> <dst> [flags]\n'
-        '  sync <name> <src> <dst> [rsync-flags...]\n'
+        '  sync <name> <src> <dst> [--gitignore] [rsync-flags...]\n'
         '  config [edit]\n'
         '  wipe\n'
     )
@@ -1067,13 +1067,13 @@ def cmd_rm(args: list[str]) -> None:
 def cmd_ls(args: list[str]) -> None:
     state = load_state()
     config = load_config(required=False)
-    explicit_probe = '--probe' in args
+    explicit_probe = '--probe' in args or '--fetch' in args
     debug = '--debug' in args
     probe = explicit_probe or should_auto_probe(state)
     ready_only = '--ready' in args
     util = '--util' in args
     if '--help' in args:
-        print('Usage: tpus ls [--probe] [--ready] [--util] [--debug]')
+        print('Usage: tpus ls [--probe|--fetch] [--ready] [--util] [--debug]')
         return
     if util:
         cmd_util([])
@@ -1199,7 +1199,9 @@ def cmd_scp(args: list[str]) -> None:
 
 def cmd_sync(args: list[str]) -> None:
     if len(args) < 3:
-        raise UsageError('Usage: tpus sync <name> <src> <dst> [rsync-flags...]')
+        raise UsageError('Usage: tpus sync <name> <src> <dst> [--gitignore] [rsync-flags...]')
+    gitignore = '--gitignore' in args
+    args = [a for a in args if a != '--gitignore']
     name, src, dst, *extra = args
     state = load_state()
     config = load_config(required=False)
@@ -1208,6 +1210,8 @@ def cmd_sync(args: list[str]) -> None:
         raise CommandError(f"TPU '{name}' not found in local state or configured zones.")
     src = remote_path(name, src)
     dst = remote_path(name, dst)
+    if gitignore:
+        extra = ['--filter=:- .gitignore', '--exclude=.git/'] + extra
     rsh = f"bash -c 'shift; exec gcloud compute tpus tpu-vm ssh {shlex.quote(name)} --zone={shlex.quote(machine['zone'])} -- \"$@\"' --"
     run(['rsync', '-e', rsh, src, dst, *extra])
 
