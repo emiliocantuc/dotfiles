@@ -61,6 +61,7 @@ wtpus() {
 
 alias claudio='claude --dangerously-skip-permissions'
 alias cogex='codex --dangerously-bypass-approvals-and-sandbox'
+alias ghw='gh repo view --web'
 
 # GPU
 alias gpu-util="nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits"
