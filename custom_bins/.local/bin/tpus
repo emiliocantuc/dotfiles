@@ -869,7 +869,7 @@ def cmd_add(args: list[str]) -> None:
     state = load_state()
     name, zone, accel_type, size, mode, cycle, shuffle, no_setup, use_default = parse_add_args(args)
     config = load_config()
-    if not use_default:
+    if not use_default and not cycle:
         sel_type, sel_zone, sel_mode = fzf_select_slot(config)
         accel_type = accel_type or sel_type
         zone = zone or sel_zone
@@ -1163,7 +1163,7 @@ def cmd_ssh(args: list[str]) -> None:
     state = load_state()
     config = load_config(required=False)
     zone, passthrough = ssh_zone_args(name, state, config, args[1:])
-    gcloud('compute', 'tpus', 'tpu-vm', 'ssh', name, f'--zone={zone}', *passthrough)
+    gcloud('compute', 'tpus', 'tpu-vm', 'ssh', name, f'--zone={zone}', *(['--', *passthrough] if passthrough else []))
 
 
 def cmd_run(args: list[str]) -> None:
