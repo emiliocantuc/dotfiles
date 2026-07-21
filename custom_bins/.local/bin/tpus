@@ -263,14 +263,17 @@ def gcloud(*args, check=True, capture=False, timeout=None, input_text=None):
     return result
 
 
-def gcloud_json(args: list[str], timeout=None):
+def gcloud_json(args: list[str], timeout=None, allow_not_found=False):
     result = gcloud(*args, check=False, capture=True, timeout=timeout)
+    detail = ((result.stderr or '') or (result.stdout or '')).strip()
     if result.returncode != 0:
-        return None
+        if allow_not_found and 'NOT_FOUND' in detail:
+            return None
+        raise CommandError(detail or f'gcloud exited {result.returncode}')
     try:
         return json.loads(result.stdout or 'null')
-    except json.JSONDecodeError:
-        return None
+    except json.JSONDecodeError as exc:
+        raise CommandError('gcloud returned invalid JSON') from exc
 
 
 TPU_FORMAT = ('--format=json(name,state,acceleratorType,schedulingConfig,labels,'
@@ -324,7 +327,10 @@ def inventory(config: dict) -> list[dict]:
 
 
 def describe(name: str, zone: str) -> dict | None:
-    item = gcloud_json(['compute', 'tpus', 'tpu-vm', 'describe', name, f'--zone={zone}', TPU_FORMAT])
+    item = gcloud_json(
+        ['compute', 'tpus', 'tpu-vm', 'describe', name, f'--zone={zone}', TPU_FORMAT],
+        allow_not_found=True,
+    )
     return to_record(item, zone) if item else None
 
 
